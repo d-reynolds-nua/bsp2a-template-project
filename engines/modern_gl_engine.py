@@ -29,7 +29,11 @@ class ModernGLEngine(BaseEngine):
             self._should_close = True
 
     def handle_events(self) -> bool:
-        self.window.process_events()
+        # moderngl-window's pyglet backend has no standalone event-poll
+        # method — new input is pulled in as a side effect of swap_buffers()
+        # (called from render()), so this reflects state as of the previous
+        # frame's render(), not this instant. That one-frame lag is inherent
+        # to the backend, not something to work around here.
         return not (self.window.is_closing or self._should_close)
 
     def update(self, audio_features: dict) -> None:
